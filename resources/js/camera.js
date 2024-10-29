@@ -1,5 +1,3 @@
-import "./bootstrap";
-
 document
     .getElementById("openCameraButton")
     .addEventListener("click", openCamera);
