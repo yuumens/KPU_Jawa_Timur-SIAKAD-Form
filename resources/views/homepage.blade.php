@@ -12,6 +12,11 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
+    <!-- <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script> -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
     <style>
         body {
             background-color: #FFAD01;
@@ -41,6 +46,11 @@
             color: #fff;
             padding: 10px 20px;
             border-radius: 5px;
+        }
+
+        .dropdown-menu {
+            max-height: 200px;
+            overflow-y: scroll;
         }
 
         #btn-close-camera {
@@ -201,7 +211,7 @@
                             </div>
 
                             <!-- Jenis Kelamin Field -->
-                            <div class="mb-4 mt-4">
+                            <!-- <div class="mb-4 mt-4">
                                 <label for="gender" class="block text-gray-600 text-sm mb-2">Jenis Kelamin</label>
                                 <select
                                     name="gender"
@@ -211,6 +221,18 @@
                                     required>
 
                                     <option value="">Pilihan</option>
+                                    <option value="L">Laki-laki</option>
+                                    <option value="P">Perempuan</option>
+                                </select>
+                            </div> -->
+
+                            <div class="mb-4 mt-4">
+                                <label for="gender" class="block text-gray-600 text-sm mb-2">Kabupaten / Kota</label>
+                                <select name="gender"
+                                    id="gender"
+                                    class="select2 text-black w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    required>
+                                    <option value=""></option>
                                     <option value="L">Laki-laki</option>
                                     <option value="P">Perempuan</option>
                                 </select>
@@ -243,26 +265,26 @@
                                 <label for="location" class="block text-gray-600 text-sm mb-2">Kabupaten / Kota</label>
                                 <select name="location"
                                     id="location"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    class="select2 text-black w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                                     required>
-                                    <option value="">Pilihan</option>
-                                    <option value="pusat">Pusat</option>
-                                    <option value="provinsi">Provinsi</option>
-                                    <option value="kabupaten">Kabupaten/Kota</option>
+                                    <option value="" place></option>
+                                    @foreach($locationmodel as $location)
+                                    <option value="{{ $location->id }}">{{ $location->locations_name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
 
-                            <!-- Jabatan Field -->
+                            <!-- Tingkat Jabatan Field -->
                             <div class="mb-4 mt-4">
-                                <label for="role" class="block text-gray-600 text-sm mb-2">Jabatan</label>
-                                <select name="role"
-                                    id="role"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                <label for="position" class="block text-gray-600 text-sm mb-2">Kabupaten / Kota</label>
+                                <select name="position"
+                                    id="position"
+                                    class="select2 text-black w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                                     required>
-                                    <option value="">Pilihan</option>
-                                    <option value="ketua">Ketua</option>
-                                    <option value="anggota">Anggota</option>
-                                    <option value="sekretaris">Sekretaris</option>
+                                    <option value="" place></option>
+                                    @foreach($positionmodel as $position)
+                                    <option value="{{ $position->id }}">{{ $position->position_name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -306,6 +328,15 @@
     </div>
     </div>
     <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: 'Pilihan',
+                allowClear: false,
+                width: '100%',
+                minimumResultsForSearch: Infinity
+            });
+        });
+
         function getCameraConfig() {
             if (screen.height <= screen.width) {
                 return {
