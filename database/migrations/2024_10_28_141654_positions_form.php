@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('positions_form', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_jabatan');
+            $table->string('position_name');
             $table->timestamps();
         });
     }
