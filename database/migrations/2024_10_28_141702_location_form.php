@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('countries_form', function (Blueprint $table) {
+        Schema::create('locations_form', function (Blueprint $table) {
             $table->id();
-            $table->string('country');
+            $table->string('locations_name');
             $table->timestamps();
         });
     }
@@ -23,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('countries_form');
+        Schema::dropIfExists('locations_form');
     }
 };
