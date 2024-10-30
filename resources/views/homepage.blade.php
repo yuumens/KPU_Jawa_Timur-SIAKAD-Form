@@ -10,7 +10,8 @@
 
     <!-- @vite('resources/css/app.css') -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
     <style>
         body {
             background-color: #FFAD01;
@@ -18,7 +19,6 @@
 
         img {
             width: 30rem;
-            /* height: 4.5rem; */
             margin-left: auto;
             margin-right: auto;
         }
@@ -41,7 +41,32 @@
             color: #fff;
             padding: 10px 20px;
             border-radius: 5px;
+        }
 
+        #btn-close-camera {
+            background-color: #dc3545;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        #btn-capture-camera {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+
+        #btn-retake-camera {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
         .submit-button {
@@ -57,6 +82,26 @@
             width: 100%;
             max-width: 100%;
             padding-top: 0 1rem;
+        }
+
+        .camera-container {
+            margin: 15px auto;
+            max-width: 320px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #photo-camera {
+            max-width: 320px;
+            margin: 15px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .camera-container video {
+            display: block;
         }
 
         /* Set ukuran form untuk screen lebih besar dari 1024px menjadi 50% */
@@ -221,19 +266,32 @@
                                 </select>
                             </div>
 
-                            <!-- Camera Button -->
-                            <div class="text-center mb-6 mt-6">
-                                <button type="button"
+                            <div class="text-center bg-light-primary rounded border-primary border border-dashed mb-8 mt-4 p-4">
+                                <div id="my_camera" class="camera-container" style="display: none;"></div>
+
+                                <div id="photoContainer" class="photo-container" style="display: none;">
+                                    <img id="photo-camera" alt="Hasil foto akan muncul di sini">
+                                </div>
+
+                                <button
+                                    type="button"
                                     class="open-camera_button"
-                                    id="openCameraButton">
+                                    id="btn-open-camera">
                                     Buka Kamera
                                 </button>
-                            </div>
+                                <button
+                                    type="button"
+                                    id="btn-close-camera"
+                                    style="display: none;">Tutup Kamera</button>
+                                <button
+                                    type="button"
+                                    id="btn-capture-camera"
+                                    style="display: none;">Ambil Foto</button>
+                                <button
+                                    type="button"
+                                    id="btn-retake-camera"
+                                    style="display: none;">Foto Ulang</button>
 
-                            <!-- Modal Kamera -->
-                            <div id="cameraContainer" class="camera-container" style="display: none;">
-                                <video id="cameraVideo" autoplay></video>
-                                <button type="button" id="takePhotoButton">Ambil Foto</button>
                             </div>
 
                             <!-- Submit Button -->
@@ -247,8 +305,134 @@
         </div>
     </div>
     </div>
+    <script>
+        function getCameraConfig() {
+            if (screen.height <= screen.width) {
+                return {
+                    width: 320,
+                    height: 240,
+                    crop_width: 240,
+                    crop_height: 240,
+                    image_format: 'jpeg',
+                    jpeg_quality: 90
+                };
+            } else {
+                return {
+                    width: 240,
+                    height: 320,
+                    crop_width: 240,
+                    crop_height: 240,
+                    image_format: 'jpeg',
+                    jpeg_quality: 90
+                };
+            }
+        }
 
-    <!-- <script src="{{ asset('js/camera.js') }}"></script> -->
+        let currentPhoto = null;
+
+        // Initialize camera functionality
+        $(document).ready(function() {
+
+            window.addEventListener('orientationchange', function() {
+                if (Webcam.active) {
+                    Webcam.reset();
+                    Webcam.set(getCameraConfig());
+                    Webcam.attach('#my_camera');
+                }
+            });
+
+            // Open Camera Button
+            $('#btn-open-camera').click(function() {
+                Webcam.set(getCameraConfig());
+                Webcam.attach('#my_camera');
+
+                $('#my_camera').show();
+                $('#btn-capture-camera').show();
+                $('#btn-close-camera').show();
+                $('#btn-open-camera').hide();
+
+                $('#photoContainer').hide();
+                $('#btn-delete-camera').hide();
+            });
+
+            // Capture Photo Button
+            $('#btn-capture-camera').click(function() {
+                Webcam.snap(function(data_uri) {
+                    currentPhoto = data_uri;
+
+                    $('#photo-camera').attr('src', data_uri);
+                    $('#photoContainer').show();
+                    $('#btn-delete-camera').hide();
+                    $('#btn-retake-camera').show();
+                    $('#btn-close-camera').show();
+
+                    $('#my_camera').hide();
+                    $('#btn-capture-camera').hide();
+
+                    savePhotoToServer(data_uri);
+                });
+            });
+
+            // Close Camera Button
+            $('#btn-close-camera').click(function() {
+                closeCamera();
+            });
+
+            $('#btn-retake-camera').click(function() {
+                retakePhoto();
+            });
+
+            // Delete Photo Button
+            $('#btn-delete-camera').click(function() {
+                deletePhoto();
+            });
+        });
+
+        function retakePhoto() {
+            currentPhoto = null;
+            $('#photo-camera').attr('src', '');
+            $('#photoContainer').hide();
+
+            $('#my_camera').show();
+            $('#btn-capture-camera').show();
+            $('#btn-delete-camera').hide();
+            $('#btn-retake-camera').hide();
+            $('#btn-close-camera').show();
+
+        }
+
+        //Close Camera Button
+        function closeCamera() {
+            Webcam.reset();
+
+            $('#my_camera').hide();
+            $('#btn-capture-camera').hide();
+            $('#btn-close-camera').hide();
+            $('#btn-delete-camera').hide();
+            $('#btn-retake-camera').hide();
+            $('#btn-open-camera').show();
+
+            $('#photoContainer').hide();
+            $('#btn-delete-camera').hide();
+        }
+
+        //Delete Photo Button
+        function deletePhoto() {
+            currentPhoto = null;
+
+            $('#photo-camera').attr('src', '');
+            $('#photoContainer').hide();
+            $('#btn-delete-camera').hide();
+            $('#btn-close-camera').hide();
+            $('#btn-retake-camera').hide();
+
+            $('#btn-open-camera').show();
+        }
+
+        Webcam.on('error', function(err) {
+            console.error('Webcam error:', err);
+        });
+    </script>
 </body>
 
 </html>
