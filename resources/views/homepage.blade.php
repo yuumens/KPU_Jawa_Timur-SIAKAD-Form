@@ -12,7 +12,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
-    <!-- <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script> -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
@@ -35,6 +34,7 @@
 
         .title-3 {
             font-size: 2rem;
+            line-height: 1;
         }
 
         .title-4 {
@@ -87,7 +87,14 @@
             cursor: pointer;
         }
 
-        /* Style umum */
+        .print-button {
+            background-color: #6c757d;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
         .form-container {
             width: 100%;
             max-width: 100%;
@@ -114,7 +121,6 @@
             display: block;
         }
 
-        /* Set ukuran form untuk screen lebih besar dari 1024px menjadi 50% */
         @media (min-width: 1024px) {
             .form-container {
                 width: 50%;
@@ -131,27 +137,6 @@
                 padding: 2rem 2rem;
                 background-color: #fff;
             }
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-content {
-            margin: 15% auto;
-            padding: 20px;
-            width: 80%;
-            max-width: 600px;
-            background-color: white;
-            text-align: center;
-            position: relative;
         }
 
         .close-button {
@@ -172,7 +157,8 @@
                 <img src="{{ asset('img/KPU-Logo.png') }}" alt="LOGO KPU">
                 <h1 class="text-white font-bold title-2">PENDAFTARAN PESERTA</h1>
                 <h2 class="text-white text-lg mt-2 title-3">
-                    Uji Coba Sirekap Pemilihan Tahun 2024
+                    Bimbingan Teknis Pemantapan Penggunaan Aplikasi SIREKAP <br>
+                    Dan Ujicoba Sirekap Pemilihan Tahun 2024
                 </h2>
                 <h2 class="text-white text-sm mt-2 title-4">
                     Tanggal Kegiatan 4 - 6 November 2024
@@ -211,7 +197,7 @@
                             </div>
 
                             <div class="mb-4 mt-4">
-                                <label for="gender" class="block text-gray-600 text-sm mb-2">Kabupaten / Kota</label>
+                                <label for="gender" class="block text-gray-600 text-sm mb-2">Jenis Kelamin</label>
                                 <select name="gender"
                                     id="gender"
                                     class="select2 text-black w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -297,12 +283,15 @@
                                     type="button"
                                     id="btn-retake-camera"
                                     style="display: none;">Foto Ulang</button>
-
                             </div>
 
                             <!-- Submit Button -->
                             <div class="text-center mt-4">
                                 <button type="submit" class="submit-button">Daftar</button>
+                            </div>
+
+                            <div class="text-center mt-8">
+                                <a href="/cetak" class="print-button">Cetak</a>
                             </div>
                         </div>
                     </form>
