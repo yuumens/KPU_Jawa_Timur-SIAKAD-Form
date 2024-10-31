@@ -15,6 +15,10 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+    {{-- sweet alert --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
     <style>
         body {
@@ -34,7 +38,6 @@
 
         .title-3 {
             font-size: 2rem;
-            line-height: 1;
         }
 
         .title-4 {
@@ -87,14 +90,7 @@
             cursor: pointer;
         }
 
-        .print-button {
-            background-color: #6c757d;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
+        /* Style umum */
         .form-container {
             width: 100%;
             max-width: 100%;
@@ -121,6 +117,7 @@
             display: block;
         }
 
+        /* Set ukuran form untuk screen lebih besar dari 1024px menjadi 50% */
         @media (min-width: 1024px) {
             .form-container {
                 width: 50%;
@@ -139,11 +136,40 @@
             }
         }
 
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            margin: 15% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            background-color: white;
+            text-align: center;
+            position: relative;
+        }
+
         .close-button {
             position: absolute;
             top: 10px;
             right: 15px;
             font-size: 24px;
+            cursor: pointer;
+        }
+
+        .print-button {
+            background-color: #6c757d;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
         }
     </style>
@@ -169,7 +195,7 @@
             <div class="rounded-lg overflow-hidden ">
                 <!-- NIK Field -->
                 <div class="p-6 main-form-card">
-                    <form action="">
+                    <form action="{{ route('pendaftaran.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-container">
                             <!-- NIK Field -->
@@ -258,6 +284,9 @@
                                 </select>
                             </div>
 
+                            {{-- <input type="hidden" name="photo" id="photo-input"> --}}
+                            <input type="hidden" name="photo_blob" id="photo-blob-input">
+
                             <div class="text-center bg-light-primary rounded border-primary border border-dashed mb-8 mt-4 p-4">
                                 <div id="my_camera" class="camera-container" style="display: none;"></div>
 
@@ -301,6 +330,71 @@
     </div>
     </div>
     <script>
+        // New algorithm
+        $(document).ready(function() {
+            // Konfigurasi dan attach Webcam.js
+            $('#btn-open-camera').click(function() {
+                Webcam.set({
+                    width: 320,
+                    height: 240,
+                    image_format: 'jpeg',
+                    jpeg_quality: 90
+                });
+                Webcam.attach('#my_camera');
+                $('#btn-capture-camera').show();
+            });
+
+            // Capture Foto dan simpan sebagai Blob
+            $('#btn-capture-camera').click(function() {
+                Webcam.snap(function(data_uri) {
+                    // Menampilkan foto hasil tangkapan di img element
+                    $('#photo-camera').attr('src', data_uri).show();
+                    $('#photoContainer').show();
+                    $('#my_camera').hide();
+                    $('#btn-capture-camera').hide();
+                    $('#btn-retake-camera').show();
+
+                    // Konversi Base64 ke Blob
+                    let blob = dataURItoBlob(data_uri);
+                    let formData = new FormData();
+
+                    // Masukkan blob ke dalam form input hidden
+                    formData.append('photo_blob', blob);
+
+                    // Simpan Blob ke hidden input agar terkirim bersama form
+                    let reader = new FileReader();
+                    reader.readAsDataURL(blob);
+                    reader.onloadend = function() {
+                        let base64data = reader.result;
+                        $('#photo-blob-input').val(base64data); // Simpan di input hidden
+                    }
+                });
+            });
+
+            // Ulangi Foto
+            $('#btn-retake-camera').click(function() {
+                $('#photoContainer').hide();
+                $('#my_camera').show();
+                $('#btn-capture-camera').show();
+                $('#btn-retake-camera').hide();
+            });
+        });
+
+        // Fungsi untuk mengkonversi Base64 ke Blob
+        function dataURItoBlob(dataURI) {
+            let byteString = atob(dataURI.split(',')[1]);
+            let mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            let ab = new ArrayBuffer(byteString.length);
+            let ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], {
+                type: mimeString
+            });
+        }
+
+        // end algorithm
         $(document).ready(function() {
             $('.select2').select2({
                 placeholder: 'Pilihan',
@@ -436,6 +530,43 @@
         Webcam.on('error', function(err) {
             console.error('Webcam error:', err);
         });
+
+        // Sweet alert
+        // Cek jika ada session flash message
+        @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '{{ session('
+            success ') }}',
+            showConfirmButton: false,
+            timer: 2000
+        });
+        @endif
+
+        @if(session('error'))
+        @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '{{ session('
+            success ') }}',
+            showConfirmButton: false,
+            timer: 2000
+        });
+        @endif
+
+        @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: '{{ session('
+            error ') }}',
+            showConfirmButton: false,
+            timer: 3000
+        });
+        @endif
+        @endif
     </script>
 </body>
 

@@ -12,6 +12,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
     <style>
@@ -106,7 +108,7 @@
             <div class="rounded-lg overflow-hidden ">
                 <!-- NIK Field -->
                 <div class="p-6 main-form-card">
-                    <form action="">
+                    <form action="{{ route('cetak.search') }}" method="POST">
                         @csrf
                         <div class="form-container">
                             <!-- NIK Field -->
@@ -122,7 +124,7 @@
                             </div>
 
                             <div class="text-center mt-8">
-                                <a href="/cetak" class="print-button">Cari</a>
+                                <button type="submit" class="print-button">Cari</button>
                             </div>
 
                             <div class="text-center back-button-container ">
@@ -135,6 +137,18 @@
         </div>
     </div>
     </div>
+
+    <!-- Tampilkan pesan error jika ada -->
+    @if(session('error'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: '{{ session('
+            error ') }}',
+        });
+    </script>
+    @endif
 </body>
 
 </html>
