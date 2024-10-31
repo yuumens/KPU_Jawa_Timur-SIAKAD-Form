@@ -13,10 +13,14 @@ return new class extends Migration
     {
         Schema::create('users_form', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
             $table->bigInteger('nik')->unique();
-            $table->string('email')->unique();
+            $table->string('nama_lengkap');
+            $table->string('jenis_kelamin'); // Tambahkan kolom jenis kelamin
             $table->bigInteger('nomor_hp')->unique();
+            $table->string('email')->unique();
+            $table->string('tingkat_satker'); // Tambahkan kolom tingkat satker (Kabupaten/Kota)
+            $table->string('jabatan'); // Tambahkan kolom jabatan/posisi
+            $table->string('photo')->nullable(); // Tambahkan kolom untuk menyimpan foto
             $table->timestamps();
         });
     }
